@@ -16,7 +16,7 @@ public class EnemyBehavior : MonoBehaviour
     private bool getCloser = false;
     private bool stopMoving = false;
 
-    private Vector3 direction = Vector3.zero;
+    private Vector3 currentPlayerDestination = Vector3.zero;
 
     void Awake()
     {
@@ -44,12 +44,13 @@ public class EnemyBehavior : MonoBehaviour
 
     void Start()
     {
-        nav.SetDestination(GameManager.instance.player.transform.position);
+        currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
+        nav.SetDestination(currentPlayerDestination);
     }
 
     void Update()
     {
-        Vector3 playerLookDirection = GameManager.instance.player.transform.position - transform.position;
+        Vector3 playerLookDirection = currentPlayerDestination - transform.position;
         playerLookDirection.y = 0;
 
         transform.rotation = Quaternion.LookRotation(playerLookDirection);
@@ -57,11 +58,11 @@ public class EnemyBehavior : MonoBehaviour
         if (startMoving && !navObj.enabled)
         {
             nav.enabled = true;
-            nav.SetDestination(GameManager.instance.player.transform.position);
+            nav.SetDestination(currentPlayerDestination);
             startMoving = false;
         }
 
-        if (Vector3.Distance(transform.position, GameManager.instance.player.transform.position) < attackDistance)
+        if (Vector3.Distance(transform.position, currentPlayerDestination) < attackDistance)
         {
             if (!isAttacking)
             {
@@ -98,7 +99,7 @@ public class EnemyBehavior : MonoBehaviour
 
         foreach (var enemy in GameManager.instance.enemies)
         {
-            if (Vector3.Distance(enemy.transform.position, GameManager.instance.player.transform.position) > attackDistance)
+            if (Vector3.Distance(enemy.transform.position, currentPlayerDestination) > attackDistance)
             {
                 enemy.navObj.enabled = false;
                 enemy.startMoving = true;
