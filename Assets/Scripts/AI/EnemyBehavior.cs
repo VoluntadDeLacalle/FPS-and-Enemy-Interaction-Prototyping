@@ -73,7 +73,10 @@ public class EnemyBehavior : MonoBehaviour
         if (Vector3.Distance(GameManager.instance.player.gameObject.transform.position, currentPlayerDestination) > (attackDistance / 2))
         {
             currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
-            nav.SetDestination(currentPlayerDestination);
+            if (nav.enabled)
+            {
+                nav.SetDestination(currentPlayerDestination);
+            }
 
             return true;
         }
