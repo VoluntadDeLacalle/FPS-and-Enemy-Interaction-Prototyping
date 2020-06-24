@@ -5,16 +5,18 @@ using UnityEngine.AI;
 
 public class EnemyBehavior : MonoBehaviour
 {
-    private NavMeshAgent nav;
+    [HideInInspector]
+    public NavMeshAgent nav;
     private NavMeshObstacle navObj;
+    private EnemyStateMachine stateMachine;
 
     public float attackDistance = 2f;
     public float rotationSpeed = 2f;
 
-    private bool isAttacking = false;
-    private bool startMoving = false;
-    private bool getCloser = false;
-    private bool stopMoving = false;
+    public bool isAttacking = false;
+    public bool startMoving = false;
+    public bool getCloser = false;
+    public bool stopMoving = false;
 
     private Vector3 currentPlayerDestination = Vector3.zero;
 
@@ -22,6 +24,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         navObj = GetComponent<NavMeshObstacle>();
         nav = GetComponent<NavMeshAgent>();
+        stateMachine = GetComponent<EnemyStateMachine>();
     }
 
     void OnEnable()
@@ -50,28 +53,80 @@ public class EnemyBehavior : MonoBehaviour
 
     void Update()
     {
+        LookAtPlayer();
+        PlayerCheck();
+    }
+
+    void LookAtPlayer()
+    {
         Vector3 playerLookDirection = currentPlayerDestination - transform.position;
         playerLookDirection.y = 0;
 
         transform.rotation = Quaternion.LookRotation(playerLookDirection);
+        
+        ///Differnt look style
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerLookDirection), rotationSpeed * Time.deltaTime);
+    }
 
+    bool PlayerCheck()
+    {
+        if (Vector3.Distance(GameManager.instance.player.gameObject.transform.position, currentPlayerDestination) > (attackDistance / 2))
+        {
+            currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
+            nav.SetDestination(currentPlayerDestination);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public void Attacking()
+    {
+        if (PlayerCheck())
+        {
+            isAttacking = false;
+
+            navObj.enabled = false;
+            startMoving = true;
+            stopMoving = false;
+
+            stateMachine.switchState(EnemyStateMachine.StateType.Chase);
+        }
+    }
+
+    public void Idling()
+    {
+        if (PlayerCheck())
+        {
+            navObj.enabled = false;
+            startMoving = true;
+            stopMoving = false;
+
+            stateMachine.switchState(EnemyStateMachine.StateType.Chase);
+        }
+
+        CheckAttack();
+    }
+
+    public void Chasing()
+    {
         if (startMoving && !navObj.enabled)
         {
             nav.enabled = true;
             nav.SetDestination(currentPlayerDestination);
+
             startMoving = false;
+            stopMoving = false;
+
+            isAttacking = false;
         }
 
-        if (Vector3.Distance(transform.position, currentPlayerDestination) < attackDistance)
+        if (!isAttacking)
         {
-            if (!isAttacking)
-            {
-                nav.enabled = false;
-                navObj.enabled = true;
-                isAttacking = true;
-            }
+            CheckAttack();
         }
-        
+
         if (getCloser)
         {
             foreach (var enemy in GameManager.instance.enemies)
@@ -82,14 +137,27 @@ public class EnemyBehavior : MonoBehaviour
                     navObj.enabled = true;
                     getCloser = false;
                     stopMoving = true;
+                    stateMachine.switchState(EnemyStateMachine.StateType.Idle);
                 }
             }
-            
+
         }
 
-        if (nav.pathStatus != NavMeshPathStatus.PathComplete && !getCloser && !stopMoving)
+        if (nav.pathStatus != NavMeshPathStatus.PathComplete && !getCloser && !stopMoving && !isAttacking)
         {
             getCloser = true;
+        }
+    }
+
+    void CheckAttack()
+    {
+        if (Vector3.Distance(transform.position, currentPlayerDestination) < attackDistance && !isAttacking)
+        {
+            nav.enabled = false;
+            navObj.enabled = true;
+            isAttacking = true;
+
+            stateMachine.switchState(EnemyStateMachine.StateType.Attack);
         }
     }
 
