@@ -35,8 +35,6 @@ public class ShootArrow : MonoBehaviour
         directionRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         ChargeBow();
-
-        Debug.Log(rb.velocity);
     }
 
     void ChargeBow()
