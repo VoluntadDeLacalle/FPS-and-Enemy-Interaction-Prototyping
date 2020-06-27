@@ -108,6 +108,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a62aef3c87ec134792c7b9eab841da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lifeSpan: 10
+  radiusOfArrow: 0.03
 --- !u!54 &2177338107188648184
 Rigidbody:
   m_ObjectHideFlags: 0
