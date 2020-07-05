@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyBehavior : Enemy
+public class GremlinEnemyBehavior : Enemy
 {
     private NavMeshAgent nav;
     private NavMeshObstacle navObj;
@@ -29,9 +29,9 @@ public class EnemyBehavior : Enemy
     void OnEnable()
     {
         bool activeEnemy = false;
-        for (int i = 0; i < GameManager.instance.enemies.Count; i++)
+        for (int i = 0; i < GameManager.instance.gremlins.Count; i++)
         {
-            if (this == GameManager.instance.enemies[i])
+            if (this == GameManager.instance.gremlins[i])
             {
                 activeEnemy = true;
                 break;
@@ -40,7 +40,7 @@ public class EnemyBehavior : Enemy
 
         if (!activeEnemy)
         {
-            GameManager.instance.enemies.Add(this);
+            GameManager.instance.gremlins.Add(this);
         }
     }
 
@@ -131,7 +131,7 @@ public class EnemyBehavior : Enemy
 
         if (getCloser)
         {
-            foreach (var enemy in GameManager.instance.enemies)
+            foreach (var enemy in GameManager.instance.gremlins)
             {
                 if (Vector3.Distance(transform.position, enemy.transform.position) < attackDistance && enemy.navObj.enabled && enemy.isAttacking)
                 {
@@ -165,9 +165,9 @@ public class EnemyBehavior : Enemy
 
     void OnDestroy()
     {
-        GameManager.instance.enemies.Remove(this);
+        GameManager.instance.gremlins.Remove(this);
 
-        foreach (var enemy in GameManager.instance.enemies)
+        foreach (var enemy in GameManager.instance.gremlins)
         {
             if (Vector3.Distance(enemy.transform.position, currentPlayerDestination) > attackDistance)
             {

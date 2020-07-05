@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
     public Player player;
-    public List<EnemyBehavior> enemies;
+    public List<GremlinEnemyBehavior> gremlins;
 
     void Awake()
     {
@@ -19,6 +19,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        enemies = new List<EnemyBehavior>();
+        gremlins = new List<GremlinEnemyBehavior>();
     }
 }

@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 4513864803180356364}
   - component: {fileID: 845533433649729851}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Gremlin
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -244,6 +244,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackDistance: 2
   rotationSpeed: 2
+  isAttacking: 0
+  startMoving: 0
+  getCloser: 0
+  stopMoving: 0
 --- !u!114 &845533433649729851
 MonoBehaviour:
   m_ObjectHideFlags: 0
