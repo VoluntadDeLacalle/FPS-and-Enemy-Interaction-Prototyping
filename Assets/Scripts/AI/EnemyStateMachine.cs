@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class EnemyStateMachine : MonoBehaviour
 {
-    EnemyBehavior enemy;
+    Enemy enemy;
 
     void Awake()
     {
-        enemy = GetComponent<EnemyBehavior>();
+        enemy = GetComponent<Enemy>();
     }
 
     void Start()

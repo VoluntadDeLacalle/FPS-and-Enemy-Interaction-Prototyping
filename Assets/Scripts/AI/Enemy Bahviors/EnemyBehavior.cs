@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyBehavior : MonoBehaviour
+public class EnemyBehavior : Enemy
 {
-    [HideInInspector]
-    public NavMeshAgent nav;
+    private NavMeshAgent nav;
     private NavMeshObstacle navObj;
     private EnemyStateMachine stateMachine;
 
@@ -84,7 +83,7 @@ public class EnemyBehavior : MonoBehaviour
         return false;
     }
 
-    public void Attacking()
+    public override void Attacking()
     {
         if (PlayerCheck())
         {
@@ -98,7 +97,7 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    public void Idling()
+    public override void Idling()
     {
         if (PlayerCheck())
         {
@@ -112,7 +111,7 @@ public class EnemyBehavior : MonoBehaviour
         CheckAttack();
     }
 
-    public void Chasing()
+    public override void Chasing()
     {
         if (startMoving && !navObj.enabled)
         {
