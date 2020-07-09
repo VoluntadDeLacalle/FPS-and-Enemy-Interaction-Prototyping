@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyBehavior : MonoBehaviour
+public class GremlinEnemyBehavior : Enemy
 {
-    [HideInInspector]
-    public NavMeshAgent nav;
+    private NavMeshAgent nav;
     private NavMeshObstacle navObj;
     private EnemyStateMachine stateMachine;
 
@@ -30,9 +29,9 @@ public class EnemyBehavior : MonoBehaviour
     void OnEnable()
     {
         bool activeEnemy = false;
-        for (int i = 0; i < GameManager.instance.enemies.Count; i++)
+        for (int i = 0; i < GameManager.instance.gremlins.Count; i++)
         {
-            if (this == GameManager.instance.enemies[i])
+            if (this == GameManager.instance.gremlins[i])
             {
                 activeEnemy = true;
                 break;
@@ -41,7 +40,7 @@ public class EnemyBehavior : MonoBehaviour
 
         if (!activeEnemy)
         {
-            GameManager.instance.enemies.Add(this);
+            GameManager.instance.gremlins.Add(this);
         }
     }
 
@@ -84,7 +83,7 @@ public class EnemyBehavior : MonoBehaviour
         return false;
     }
 
-    public void Attacking()
+    public override void Attacking()
     {
         if (PlayerCheck())
         {
@@ -98,7 +97,7 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    public void Idling()
+    public override void Idling()
     {
         if (PlayerCheck())
         {
@@ -112,7 +111,7 @@ public class EnemyBehavior : MonoBehaviour
         CheckAttack();
     }
 
-    public void Chasing()
+    public override void Chasing()
     {
         if (startMoving && !navObj.enabled)
         {
@@ -132,7 +131,7 @@ public class EnemyBehavior : MonoBehaviour
 
         if (getCloser)
         {
-            foreach (var enemy in GameManager.instance.enemies)
+            foreach (var enemy in GameManager.instance.gremlins)
             {
                 if (Vector3.Distance(transform.position, enemy.transform.position) < attackDistance && enemy.navObj.enabled && enemy.isAttacking)
                 {
@@ -166,9 +165,9 @@ public class EnemyBehavior : MonoBehaviour
 
     void OnDestroy()
     {
-        GameManager.instance.enemies.Remove(this);
+        GameManager.instance.gremlins.Remove(this);
 
-        foreach (var enemy in GameManager.instance.enemies)
+        foreach (var enemy in GameManager.instance.gremlins)
         {
             if (Vector3.Distance(enemy.transform.position, currentPlayerDestination) > attackDistance)
             {

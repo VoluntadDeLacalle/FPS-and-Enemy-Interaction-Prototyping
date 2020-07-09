@@ -10,6 +10,8 @@ public class EnemyRaycastShoot : MonoBehaviour
     public float maxShotDistance = 0;
     [Tooltip("Determines accuracy.")]
     public float maxDeviation = 0;
+    [Range(0, 360)]
+    public float maxAngleOfDeviation = 0;
     
     public bool canGetAccurate = false;
     [Tooltip("Only matters if the enemy can get more accurate. Determines amount of landed shots needed to increase accuracy.")]
@@ -36,15 +38,15 @@ public class EnemyRaycastShoot : MonoBehaviour
         positionFiredFrom = transform.position;
     }
 
-    void Update()
+    public void Shooting()
     {
         target = GameManager.instance.player.transform.gameObject;
         positionFiredFrom = transform.position;
 
-        Shoot();
+        Fire();
     }
 
-    void Shoot()
+    void Fire()
     {
         fireRate -= Time.deltaTime;
 
@@ -82,7 +84,7 @@ public class EnemyRaycastShoot : MonoBehaviour
         Vector3 initialDirection = target.transform.position - positionFiredFrom;
 
         float deviation = Random.Range(0, maxDeviation);
-        float angle = Random.Range(0, 360);
+        float angle = Random.Range(0, maxAngleOfDeviation);
 
         initialDirection = Quaternion.AngleAxis(deviation, Vector3.up) * initialDirection;
         initialDirection = Quaternion.AngleAxis(angle, Vector3.forward) * initialDirection;
