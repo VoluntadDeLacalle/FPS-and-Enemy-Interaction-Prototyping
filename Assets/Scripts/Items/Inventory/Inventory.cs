@@ -9,7 +9,7 @@ public class Inventory : MonoBehaviour
     {
         if (instance != null)
         {
-            Debug.LogWarning("Andrew Failed to make an instance please let him know");
+            Debug.LogWarning("Andrew failed to make an instance please let him know");
             return;
         }
         instance = this;
@@ -24,12 +24,26 @@ public class Inventory : MonoBehaviour
 
     public bool Add(ScriptableItem item)
     {
-        if (items.Count >= space)
+        if (items.Contains(item) && item.stackable)
         {
-            Debug.Log("Inventory Full");
-            return false;
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i] == item)
+                {
+                    items[i].numberAvalible++;
+                    Debug.Log("You have " + items[i].numberAvalible + " " + items[i].name + " now.");
+                }
+            }
         }
-        items.Add(item);
+        else
+        {
+            if (items.Count >= space)
+            {
+                Debug.Log("Inventory Full");
+                return false;
+            }
+            items.Add(item);
+        }
         if (onItemChangedCallBack != null)
         {
             onItemChangedCallBack.Invoke();
