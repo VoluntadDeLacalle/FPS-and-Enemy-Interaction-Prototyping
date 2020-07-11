@@ -20,10 +20,11 @@ public class EnemyStateMachine : MonoBehaviour
     {
         Chase,
         Attack,
-        Idle
+        Idle,
+        Flee
     }
 
-    public StateType state = StateType.Chase;
+    public StateType state = StateType.Idle;
 
     void Update()
     {
@@ -37,6 +38,9 @@ public class EnemyStateMachine : MonoBehaviour
                 break;
             case StateType.Idle:
                 enemy.Idling();
+                break;
+            case StateType.Flee:
+                enemy.Fleeing();
                 break;
         }
     }
@@ -52,13 +56,16 @@ public class EnemyStateMachine : MonoBehaviour
         switch (state)
         {
             case StateType.Chase:
-
+                enemy.ChaseEnter();
                 break;
             case StateType.Attack:
-
+                enemy.AttackEnter();
                 break;
             case StateType.Idle:
-
+                enemy.IdleEnter();
+                break;
+            case StateType.Flee:
+                enemy.FleeEnter();
                 break;
         }
     }

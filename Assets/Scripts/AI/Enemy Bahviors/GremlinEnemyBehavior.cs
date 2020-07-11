@@ -5,12 +5,17 @@ using UnityEngine.AI;
 
 public class GremlinEnemyBehavior : Enemy
 {
-    private NavMeshAgent nav;
-    private NavMeshObstacle navObj;
-    private EnemyStateMachine stateMachine;
+    [HideInInspector]
+    public NavMeshAgent nav;
+    [HideInInspector]
+    public NavMeshObstacle navObj;
+    [HideInInspector]
+    public EnemyStateMachine stateMachine;
 
     public float attackDistance = 2f;
-    public float rotationSpeed = 2f;
+    public float normalSpeed = 3.5f;
+    public float fleeingSpeed = 7.5f;
+    public float fleeingDestinationDistance = 2f;
 
     public bool isAttacking = false;
     public bool startMoving = false;
@@ -18,6 +23,8 @@ public class GremlinEnemyBehavior : Enemy
     public bool stopMoving = false;
 
     private Vector3 currentPlayerDestination = Vector3.zero;
+
+    private List<GameObject> chasers = new List<GameObject>();
 
     void Awake()
     {
@@ -48,12 +55,18 @@ public class GremlinEnemyBehavior : Enemy
     {
         currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
         nav.SetDestination(currentPlayerDestination);
+
+        SetChasers(GameManager.instance.player.gameObject);
     }
 
     void Update()
     {
-        LookAtPlayer();
         PlayerCheck();
+
+        if (stateMachine.state != EnemyStateMachine.StateType.Flee)
+        {
+            LookAtPlayer();
+        }
     }
 
     void LookAtPlayer()
@@ -62,9 +75,6 @@ public class GremlinEnemyBehavior : Enemy
         playerLookDirection.y = 0;
 
         transform.rotation = Quaternion.LookRotation(playerLookDirection);
-        
-        ///Differnt look style
-        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerLookDirection), rotationSpeed * Time.deltaTime);
     }
 
     bool PlayerCheck()
@@ -111,18 +121,23 @@ public class GremlinEnemyBehavior : Enemy
         CheckAttack();
     }
 
-    public override void Chasing()
+    public void ResetNav(Vector3 destination)
     {
         if (startMoving && !navObj.enabled)
         {
             nav.enabled = true;
-            nav.SetDestination(currentPlayerDestination);
+            nav.SetDestination(destination);
 
             startMoving = false;
             stopMoving = false;
 
             isAttacking = false;
         }
+    }
+
+    public override void Chasing()
+    {
+        ResetNav(currentPlayerDestination);
 
         if (!isAttacking)
         {
@@ -160,6 +175,34 @@ public class GremlinEnemyBehavior : Enemy
             isAttacking = true;
 
             stateMachine.switchState(EnemyStateMachine.StateType.Attack);
+        }
+    }
+
+    public void SetChasers(GameObject chaser)
+    {
+        chasers.Add(chaser);
+    }
+
+    public override void FleeEnter()
+    {
+        nav.speed = fleeingSpeed;
+    }
+
+    public override void Fleeing()
+    {
+        Vector3 fleeDir = Vector3.zero;
+        for (int i = 0; i < chasers.Count; i++)
+        {
+            fleeDir += (transform.position - chasers[i].transform.position);
+        }
+
+        ResetNav(fleeDir);
+
+        if (Vector3.Distance(transform.position, nav.pathEndPosition) < fleeingDestinationDistance)
+        {
+            nav.speed = normalSpeed;
+            startMoving = true;
+            stateMachine.switchState(EnemyStateMachine.StateType.Chase);
         }
     }
 
