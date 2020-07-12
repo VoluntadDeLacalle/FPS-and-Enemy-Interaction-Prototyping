@@ -246,9 +246,11 @@ MonoBehaviour:
   attackDistance: 2.5
   chargeTimer: 1.5
   normalSpeed: 3.5
-  chargeSpeed: 7
+  chargeSpeed: 12
   lengthPastPlayer: 3
   sphereCastRadius: 2
+  knockbackUpwardMagnitude: 1
+  knockbackForce: 10
   isAttacking: 0
   startMoving: 0
 --- !u!114 &7762375747756329106

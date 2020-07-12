@@ -9,22 +9,34 @@ public class ChargerEnemyBehavior : Enemy
     private NavMeshObstacle navObj;
     private EnemyStateMachine stateMachine;
 
+    [Header("Enemy Ranges")]
     public float detectionRange = 0f;
     public float attackDistance = 0f;
 
+    [Header("Charge Settings")]
     public float chargeTimer = 0f;
     private float maxChargeTimer = 0f;
+    [Tooltip("Currently not being used for anything. Will probably implment later on.")]
     public float normalSpeed = 3.5f;
     public float chargeSpeed = 7f;
+    [Tooltip("Use this to show how far past the player the enemy will charge.")]
     public float lengthPastPlayer = 1f;
     
+    [Header("Enemy Interaction Settings")]
     public float sphereCastRadius = 0f;
 
+    [Header("Player Knockback Settings")]
+    public float knockbackUpwardMagnitude = 1f;
+    public float knockbackForce = 1f;
+
+    [HideInInspector]
     public bool isAttacking = false;
+    [HideInInspector]
     public bool startMoving = false;
 
     Vector3 currentPlayerDestination = Vector3.zero;
     Vector3 chargeDestination = Vector3.zero;
+    Vector3 knockbackDirectionGizmo = Vector3.zero;
 
     void Awake()
     {
@@ -52,6 +64,9 @@ public class ChargerEnemyBehavior : Enemy
     {
         Gizmos.color = Color.black;
         Gizmos.DrawLine(chargeDestination, chargeDestination + (Vector3.up * 4));
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(transform.position, transform.position + knockbackDirectionGizmo * 3);
     }
 
     void Start()
@@ -62,7 +77,6 @@ public class ChargerEnemyBehavior : Enemy
     void Update()
     {
         PlayerCheck();
-        //LookAtPlayer();
     }
 
     bool PlayerCheck()
@@ -161,35 +175,19 @@ public class ChargerEnemyBehavior : Enemy
 
         if (Vector3.Distance(transform.position, currentPlayerDestination) < attackDistance)
         {
-            //Apply knockback to player.
             nav.ResetPath();
+
+            //if (GameManager.instance.player.rb != null)
+            //{
+            //    Vector3 knockbackDirection = (currentPlayerDestination - transform.position).normalized + (Vector3.up * knockbackUpwardMagnitude);
+            //    knockbackDirectionGizmo = knockbackDirection;
+
+            //    GameManager.instance.player.rb.AddForce(knockbackDirection * knockbackForce);
+            //}
 
             chargeTimer = maxChargeTimer;
             FindChargeDestination();
         }
-    }
-
-    public void ResetNav(Vector3 destination)
-    {
-        if (startMoving && !navObj.enabled)
-        {
-            nav.enabled = true;
-            nav.SetDestination(destination);
-
-            startMoving = false;
-
-            isAttacking = false;
-        }
-    }
-
-    public override void ChaseEnter()
-    {
-        nav.speed = normalSpeed;
-    }
-
-    public override void Chasing()
-    {
-        ResetNav(currentPlayerDestination);
     }
 
     public override void Idling()
