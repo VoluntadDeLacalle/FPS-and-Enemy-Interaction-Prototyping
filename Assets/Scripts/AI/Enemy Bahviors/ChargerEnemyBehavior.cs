@@ -10,7 +10,9 @@ public class ChargerEnemyBehavior : Enemy
     private EnemyStateMachine stateMachine;
 
     [Header("Enemy Ranges")]
+    [Tooltip("Red Gizmo Wire Sphere")]
     public float detectionRange = 0f;
+    [Tooltip("Blue Gizmo Wire Sphere")]
     public float attackDistance = 0f;
 
     [Header("Charge Settings")]
@@ -23,6 +25,7 @@ public class ChargerEnemyBehavior : Enemy
     public float lengthPastPlayer = 1f;
     
     [Header("Enemy Interaction Settings")]
+    [Tooltip("White Gizmo Wire Sphere")]
     public float sphereCastRadius = 0f;
 
     [Header("Player Knockback Settings")]
@@ -105,7 +108,7 @@ public class ChargerEnemyBehavior : Enemy
     void MoveGremlins()
     {
         RaycastHit[] hitInfos = new RaycastHit[] { };
-        hitInfos = Physics.SphereCastAll(transform.position, sphereCastRadius, currentPlayerDestination - transform.position, Vector3.Distance(currentPlayerDestination, transform.position));
+        hitInfos = Physics.SphereCastAll(transform.position, sphereCastRadius, chargeDestination - transform.position, Vector3.Distance(transform.position, chargeDestination));
 
         List<GremlinEnemyBehavior> gremlinsHit = new List<GremlinEnemyBehavior>();
         for (int i = 0; i < hitInfos.Length; i++)
@@ -118,14 +121,17 @@ public class ChargerEnemyBehavior : Enemy
 
         foreach (var gremlin in gremlinsHit)
         {
-            gremlin.SetChasers(this.gameObject);
+            if (gremlin.stateMachine.state != EnemyStateMachine.StateType.Flee)
+            {
+                gremlin.SetChasers(this.gameObject);
 
-            gremlin.isAttacking = false;
-            gremlin.navObj.enabled = false;
-            gremlin.startMoving = true;
-            gremlin.stopMoving = false;
+                gremlin.isAttacking = false;
+                gremlin.navObj.enabled = false;
+                gremlin.startMoving = true;
+                gremlin.stopMoving = false;
 
-            gremlin.stateMachine.switchState(EnemyStateMachine.StateType.Flee);
+                gremlin.stateMachine.switchState(EnemyStateMachine.StateType.Flee);
+            }
         }
     }
     
@@ -137,6 +143,8 @@ public class ChargerEnemyBehavior : Enemy
         chargeDestination = currentPlayerDestination + (chargeDirection * lengthPastPlayer);
 
         transform.rotation = Quaternion.LookRotation(chargeDirection);
+
+        MoveGremlins();
     }
 
     public override void AttackEnter()
@@ -145,8 +153,6 @@ public class ChargerEnemyBehavior : Enemy
         nav.speed = chargeSpeed;
 
         FindChargeDestination();
-
-        MoveGremlins();
     }
 
     public override void Attacking()

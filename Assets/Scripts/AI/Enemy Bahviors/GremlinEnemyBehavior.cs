@@ -12,17 +12,29 @@ public class GremlinEnemyBehavior : Enemy
     [HideInInspector]
     public EnemyStateMachine stateMachine;
 
+    [Header("Enemy Ranges")]
     public float attackDistance = 2f;
+
+    [Header("Enemy Speeds")]
     public float normalSpeed = 3.5f;
     public float fleeingSpeed = 7.5f;
-    public float fleeingDestinationDistance = 2f;
 
+    [Header("Enemy Fleeing Settings")]
+    public float fleeingDestinationDistance = 2f;
+    public float fleeTimer = 0f;
+    private float maxFleeTimer = 0f;
+    
+    [HideInInspector]
     public bool isAttacking = false;
+    [HideInInspector]
     public bool startMoving = false;
+    [HideInInspector]
     public bool getCloser = false;
+    [HideInInspector]
     public bool stopMoving = false;
 
     private Vector3 currentPlayerDestination = Vector3.zero;
+    private Vector3 fleeDestination = Vector3.zero;
 
     private List<GameObject> chasers = new List<GameObject>();
 
@@ -31,6 +43,8 @@ public class GremlinEnemyBehavior : Enemy
         navObj = GetComponent<NavMeshObstacle>();
         nav = GetComponent<NavMeshAgent>();
         stateMachine = GetComponent<EnemyStateMachine>();
+
+        maxFleeTimer = fleeTimer;
     }
 
     void OnEnable()
@@ -51,6 +65,12 @@ public class GremlinEnemyBehavior : Enemy
         }
     }
 
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine(fleeDestination, fleeDestination + (Vector3.up * 4));
+    }
+
     void Start()
     {
         currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
@@ -61,10 +81,9 @@ public class GremlinEnemyBehavior : Enemy
 
     void Update()
     {
-        PlayerCheck();
-
         if (stateMachine.state != EnemyStateMachine.StateType.Flee)
         {
+            PlayerCheck();
             LookAtPlayer();
         }
     }
@@ -186,19 +205,34 @@ public class GremlinEnemyBehavior : Enemy
     public override void FleeEnter()
     {
         nav.speed = fleeingSpeed;
-    }
+        fleeTimer = maxFleeTimer;
 
-    public override void Fleeing()
-    {
         Vector3 fleeDir = Vector3.zero;
         for (int i = 0; i < chasers.Count; i++)
         {
             fleeDir += (transform.position - chasers[i].transform.position);
         }
 
-        ResetNav(fleeDir);
+        int rand = Random.Range(0, 2);
+        if (rand == 0)
+        {
+            fleeDir = Vector3.RotateTowards(fleeDir, fleeDir + transform.right * 5, 90, 2);
+        }
+        else
+        {
+            fleeDir = Vector3.RotateTowards(fleeDir, fleeDir + (-transform.right) * 5, 90, 2);
+        }
 
-        if (Vector3.Distance(transform.position, nav.pathEndPosition) < fleeingDestinationDistance)
+        fleeDestination = fleeDir;
+        ResetNav(fleeDir);
+        fleeDestination.y = nav.pathEndPosition.y;
+    }
+
+    public override void Fleeing()
+    {
+        fleeTimer -= Time.deltaTime;
+
+        if (Vector3.Distance(transform.position, fleeDestination) < fleeingDestinationDistance || fleeTimer <= 0)
         {
             nav.speed = normalSpeed;
             startMoving = true;

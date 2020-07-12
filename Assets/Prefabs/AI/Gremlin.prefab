@@ -125,7 +125,7 @@ Transform:
   m_GameObject: {fileID: 7545755998415331063}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.75, z: 1}
   m_Children:
   - {fileID: 2748270624195565953}
   m_Father: {fileID: 0}
@@ -249,6 +249,7 @@ MonoBehaviour:
   normalSpeed: 3.5
   fleeingSpeed: 6.5
   fleeingDestinationDistance: 2
+  fleeTimer: 5
   isAttacking: 0
   startMoving: 0
   getCloser: 0
