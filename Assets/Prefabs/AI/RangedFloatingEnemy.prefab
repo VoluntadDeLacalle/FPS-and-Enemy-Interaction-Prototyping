@@ -118,8 +118,8 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 5
-  m_BaseOffset: 4
+  m_Height: 2
+  m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!208 &6314352311742616679
@@ -152,6 +152,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackDistance: 10
   rotationSpeed: 50
+  upwardYAltitude: 6
+  flyingUpSpeed: 2
 --- !u!114 &2681705777051141962
 MonoBehaviour:
   m_ObjectHideFlags: 0
