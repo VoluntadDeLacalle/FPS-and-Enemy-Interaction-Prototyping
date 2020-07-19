@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 public class RangedEnemyBehavior : Enemy
 {
@@ -12,6 +13,9 @@ public class RangedEnemyBehavior : Enemy
 
     public float attackDistance = 2f;
     public float rotationSpeed = 2f;
+
+    public float upwardYAltitude = 6f;
+    public float flyingUpSpeed = 2f;
 
     private bool startMoving = false;
     private bool isAttacking = false;
@@ -36,6 +40,9 @@ public class RangedEnemyBehavior : Enemy
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(gameObject.transform.position, attackDistance);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.up * upwardYAltitude);
     }
 
     void Update()
@@ -99,8 +106,10 @@ public class RangedEnemyBehavior : Enemy
         {
             nav.enabled = false;
             navObj.enabled = true;
-            isAttacking = true;
 
+            transform.DOMove(transform.position + Vector3.up * upwardYAltitude, flyingUpSpeed);
+
+            isAttacking = true;
             stateMachine.switchState(EnemyStateMachine.StateType.Attack);
         }
     }
