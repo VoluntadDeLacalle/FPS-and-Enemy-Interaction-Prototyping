@@ -42,6 +42,7 @@ public class Inventory : MonoBehaviour
                 Debug.Log("Inventory Full");
                 return false;
             }
+            item.numberAvalible = 1;
             items.Add(item);
         }
         if (onItemChangedCallBack != null)

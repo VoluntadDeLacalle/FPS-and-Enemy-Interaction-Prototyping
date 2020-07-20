@@ -19,4 +19,13 @@ public class ScriptableItem : ScriptableObject
 
         Debug.Log("Used " + ItemName + ".");
     }
+
+    public void RemoveFromInventory()
+    {
+        numberAvalible--;
+        if (numberAvalible <= 0)
+        {
+            Inventory.instance.Remove(this);
+        }
+    }
 }

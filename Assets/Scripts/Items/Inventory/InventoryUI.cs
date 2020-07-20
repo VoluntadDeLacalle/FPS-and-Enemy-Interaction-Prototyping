@@ -28,6 +28,15 @@ public class InventoryUI : MonoBehaviour
         {
             inventoryPanel.SetActive(!inventoryPanel.activeSelf);
         }
+        Cursor.visible = inventoryPanel.activeSelf;
+        if(Cursor.visible)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     void UpdateUI()
