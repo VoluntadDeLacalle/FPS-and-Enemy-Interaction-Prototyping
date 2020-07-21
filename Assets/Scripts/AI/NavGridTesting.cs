@@ -7,8 +7,10 @@ public class NavGridTesting : MonoBehaviour
     public Azee.PathFinding3D.NavGridAgent navGridAgent;
 
     private List<Vector3> pathToTarget = new List<Vector3>();
+    private List<Vector3> currentGizmoPath;
 
     public float speed = 4f;
+    public float pathSegments = 1f;
 
     private Vector3 startPosition = Vector3.zero;
     private Vector3 endPosition = Vector3.zero;
@@ -18,6 +20,20 @@ public class NavGridTesting : MonoBehaviour
     private int count = 1;
 
     private bool isLerping = false;
+
+    void OnDrawGizmosSelected()
+    {
+        if (currentGizmoPath != null && currentGizmoPath.Count > 1)
+        {
+            Vector3[] smoothPath = LineSmoother.SmoothLine(currentGizmoPath.ToArray(), pathSegments);
+                
+            Gizmos.color = Color.green;
+            for (int i = 1; i < smoothPath.Length; i++)
+            {
+                Gizmos.DrawLine(smoothPath[i - 1], smoothPath[i]);
+            }
+        }
+    }
 
     void StartLerping()
     {
@@ -33,17 +49,25 @@ public class NavGridTesting : MonoBehaviour
         }
     }
 
+    void SetDestination(Transform target)
+    {
+        pathToTarget = navGridAgent.FindPathToTarget(target);
+        currentGizmoPath = new List<Vector3>(pathToTarget);
+
+        count = 1;
+        StartLerping();
+    }
+
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            pathToTarget = navGridAgent.FindPathToTarget(GameManager.instance.player.transform);
-
-            count = 1;
-            StartLerping();
+            SetDestination(GameManager.instance.player.transform);
         }
     }
-    
+
+    //Keep check to see how to update the gizmos path and such!
+
     void FixedUpdate()
     {
         if (isLerping)
@@ -57,6 +81,8 @@ public class NavGridTesting : MonoBehaviour
             {
                 isLerping = false;
                 count++;
+                
+                currentGizmoPath = navGridAgent.FindPathToTarget(GameManager.instance.player.transform);
 
                 if (count != pathToTarget.Count)
                 {
