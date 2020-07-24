@@ -102,7 +102,7 @@ public class RangedEnemyBehavior : Enemy
 
     void LookAtPlayer()
     {
-        Vector3 playerLookDirection = currentPlayerDestination - transform.position;
+        Vector3 playerLookDirection = GameManager.instance.player.transform.position - transform.position;
 
         if (!agentMovement3D.isMoving)
         {

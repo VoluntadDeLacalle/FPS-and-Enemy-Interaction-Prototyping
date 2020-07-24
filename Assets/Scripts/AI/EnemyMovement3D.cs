@@ -124,10 +124,14 @@ public class EnemyMovement3D : MonoBehaviour
 
             if (percentageComplete >= 1.0f)
             {
+                currentGizmoPath.Remove(pathToTarget[count]);
                 isLerping = false;
                 count++;
-                
-                currentGizmoPath = navGridAgent.FindPathToTarget(endOfPath);
+
+                if (currentGizmoPath.Contains(pathToTarget[0]))
+                {
+                    currentGizmoPath.Remove(pathToTarget[0]);
+                }
 
                 if (count != pathToTarget.Count)
                 {
