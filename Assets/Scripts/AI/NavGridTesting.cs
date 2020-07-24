@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NavExtension;
 
 public class NavGridTesting : MonoBehaviour
 {
@@ -82,7 +83,7 @@ public class NavGridTesting : MonoBehaviour
                 isLerping = false;
                 count++;
                 
-                currentGizmoPath = navGridAgent.FindPathToTarget(GameManager.instance.player.transform);
+                currentGizmoPath = navGridAgent.FindPathToTarget(pathToTarget[pathToTarget.Count - 1]);
 
                 if (count != pathToTarget.Count)
                 {
