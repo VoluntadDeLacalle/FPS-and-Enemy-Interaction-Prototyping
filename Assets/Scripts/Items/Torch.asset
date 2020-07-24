@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bbc119c5814a2e45bdff591ba3b7b80, type: 3}
-  m_Name: Torch 1
+  m_Name: Torch
   m_EditorClassIdentifier: 
   ItemName: New Item
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: eb5f6e2757c821940b69cf1456f7865a, type: 3}
   stackable: 1
-  numberAvalible: 1
+  numberAvalible: 0
+  maxRange: 20
+  torchDuration: 30
