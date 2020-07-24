@@ -20,6 +20,9 @@ public class EnemyMovement3D : MonoBehaviour
     private float timeStartedLerping = 0f;
     private int count = 1;
 
+    public bool lookPathDirection = false;
+    [HideInInspector]
+    public bool isMoving = false;
     private bool isLerping = false;
 
     void OnDrawGizmosSelected()
@@ -48,9 +51,11 @@ public class EnemyMovement3D : MonoBehaviour
 
             timeTakenDuringLerp = (Vector3.Distance(startPosition, endPosition)) / speed;
         }
+
+        isMoving = true;
     }
 
-    void SetDestination(Vector3 target)
+    public void SetDestination(Vector3 target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
         currentGizmoPath = new List<Vector3>(pathToTarget);
@@ -59,13 +64,25 @@ public class EnemyMovement3D : MonoBehaviour
         StartLerping();
     }
 
-    void SetDestination(Transform target)
+    public void SetDestination(Transform target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
         currentGizmoPath = new List<Vector3>(pathToTarget);
 
         count = 1;
         StartLerping();
+    }
+
+    public void Stop()
+    {
+        if (isMoving)
+        {
+            isLerping = false;
+            isMoving = false;
+            count = pathToTarget.Count;
+
+            currentGizmoPath.Clear();
+        }
     }
 
     void LookAtPath()
@@ -77,14 +94,9 @@ public class EnemyMovement3D : MonoBehaviour
 
     void Update()
     {
-        if (isLerping)
+        if (isLerping && lookPathDirection)
         {
             LookAtPath();
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            SetDestination(GameManager.instance.player.transform);
         }
     }
 
@@ -107,6 +119,10 @@ public class EnemyMovement3D : MonoBehaviour
                 if (count != pathToTarget.Count)
                 {
                     StartLerping();
+                }
+                else
+                {
+                    isMoving = false;
                 }
             }
         }
