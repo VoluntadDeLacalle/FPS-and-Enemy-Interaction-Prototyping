@@ -15,6 +15,8 @@ public class EnemyMovement3D : MonoBehaviour
 
     private Vector3 startPosition = Vector3.zero;
     private Vector3 endPosition = Vector3.zero;
+    [HideInInspector]
+    public Vector3 endOfPath = Vector3.zero;
 
     private float timeTakenDuringLerp = 0f;
     private float timeStartedLerping = 0f;
@@ -24,6 +26,11 @@ public class EnemyMovement3D : MonoBehaviour
     [HideInInspector]
     public bool isMoving = false;
     private bool isLerping = false;
+
+    void Start()
+    {
+        endOfPath = transform.position;
+    }
 
     void OnDrawGizmosSelected()
     {
@@ -58,6 +65,7 @@ public class EnemyMovement3D : MonoBehaviour
     public void SetDestination(Vector3 target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
+        endOfPath = pathToTarget[pathToTarget.Count - 1];
         currentGizmoPath = new List<Vector3>(pathToTarget);
 
         count = 1;
@@ -67,6 +75,8 @@ public class EnemyMovement3D : MonoBehaviour
     public void SetDestination(Transform target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
+        endOfPath = pathToTarget[pathToTarget.Count - 1];
+
         currentGizmoPath = new List<Vector3>(pathToTarget);
 
         count = 1;
@@ -87,9 +97,12 @@ public class EnemyMovement3D : MonoBehaviour
 
     void LookAtPath()
     {
-        Vector3 direction = pathToTarget[count] - transform.position;
+        if (count > 0 && count >= pathToTarget.Count)
+        {
+            Vector3 direction = pathToTarget[count] - transform.position;
 
-        transform.rotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
     }
 
     void Update()
@@ -114,7 +127,7 @@ public class EnemyMovement3D : MonoBehaviour
                 isLerping = false;
                 count++;
                 
-                currentGizmoPath = navGridAgent.FindPathToTarget(pathToTarget[pathToTarget.Count - 1]);
+                currentGizmoPath = navGridAgent.FindPathToTarget(endOfPath);
 
                 if (count != pathToTarget.Count)
                 {
@@ -123,6 +136,7 @@ public class EnemyMovement3D : MonoBehaviour
                 else
                 {
                     isMoving = false;
+                    endOfPath = transform.position;
                 }
             }
         }
