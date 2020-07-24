@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using NavExtension;
 
-public class NavGridTesting : MonoBehaviour
+public class EnemyMovement3D : MonoBehaviour
 {
     public Azee.PathFinding3D.NavGridAgent navGridAgent;
 
@@ -50,6 +50,15 @@ public class NavGridTesting : MonoBehaviour
         }
     }
 
+    void SetDestination(Vector3 target)
+    {
+        pathToTarget = navGridAgent.FindPathToTarget(target);
+        currentGizmoPath = new List<Vector3>(pathToTarget);
+
+        count = 1;
+        StartLerping();
+    }
+
     void SetDestination(Transform target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
@@ -59,15 +68,25 @@ public class NavGridTesting : MonoBehaviour
         StartLerping();
     }
 
+    void LookAtPath()
+    {
+        Vector3 direction = pathToTarget[count] - transform.position;
+
+        transform.rotation = Quaternion.LookRotation(direction);
+    }
+
     void Update()
     {
+        if (isLerping)
+        {
+            LookAtPath();
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             SetDestination(GameManager.instance.player.transform);
         }
     }
-
-    //Keep check to see how to update the gizmos path and such!
 
     void FixedUpdate()
     {
