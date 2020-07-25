@@ -23,7 +23,6 @@ public class RangedEnemyBehavior : Enemy
 
     private Vector3 currentPlayerDestination = Vector3.zero;
     private float currentAltitude = 0;
-    private float angle = 0;
 
     private float firstChaseEnter = 0f;
 
@@ -52,12 +51,6 @@ public class RangedEnemyBehavior : Enemy
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(minAltitudeposition, maxAltitudeposition);
-
-        
-
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination + new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad)) * 4);
-        Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination - new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad)) * 4);
     }
 
     void Update()
@@ -79,9 +72,9 @@ public class RangedEnemyBehavior : Enemy
     void SetTargetPlayer()
     {
         currentAltitude = Random.Range(minAltitude, maxAltitude);
-        angle = Vector3.Angle(transform.position, currentPlayerDestination) + 90;
+        float targetAngle = Vector3.Angle(transform.position, currentPlayerDestination) + 90;
 
-        Vector3 target = FindTargetPoint(innerAttackRadius, outerAttackRadius, Random.Range(-angle, angle));
+        Vector3 target = FindTargetPoint(innerAttackRadius, outerAttackRadius, Random.Range(0, 2 * Mathf.PI));
         target.y = currentAltitude;
 
         agentMovement3D.SetDestination(target);
