@@ -10,9 +10,11 @@ public class RangedEnemyBehavior : Enemy
     private EnemyStateMachine stateMachine;
     private EnemyRaycastShoot raycastShoot;
 
+    public float rotationSpeed = 2f;
+
+    [Header("Enemy Ranges")]
     public float innerAttackRadius = 2f;
     public float outerAttackRadius = 2f;
-    public float rotationSpeed = 2f;
 
     [Header("Altitude Range - Yellow Gizmo Line")]
     public float minAltitude = 6f;
@@ -23,7 +25,6 @@ public class RangedEnemyBehavior : Enemy
 
     private Vector3 currentPlayerDestination = Vector3.zero;
     private float currentAltitude = 0;
-
     private float firstChaseEnter = 0f;
 
     void Awake()

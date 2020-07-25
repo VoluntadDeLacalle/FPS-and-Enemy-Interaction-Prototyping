@@ -10,21 +10,25 @@ public class EnemyMovement3D : MonoBehaviour
     private List<Vector3> pathToTarget = new List<Vector3>();
     private List<Vector3> currentGizmoPath;
 
+    [Header("Nav Grid Agent Variables")]
+    [Tooltip("Speed of the agent as it traverses the path.")]
     public float speed = 4f;
+    [Tooltip("Will determine if the object looks along the path as it traverses.")]
+    public bool lookPathDirection = false;
+
+    [Header("Gizmo Variables")]
+    [Tooltip("Determines how smooth the path of the agent will look.")]
     public float pathSegments = 1f;
 
     private Vector3 startPosition = Vector3.zero;
     private Vector3 endPosition = Vector3.zero;
-    [HideInInspector]
-    public Vector3 endOfPath = Vector3.zero;
+    [HideInInspector] public Vector3 endOfPath = Vector3.zero;
 
     private float timeTakenDuringLerp = 0f;
     private float timeStartedLerping = 0f;
     private int count = 1;
-
-    public bool lookPathDirection = false;
-    [HideInInspector]
-    public bool isMoving = false;
+    
+    [HideInInspector] public bool isMoving = false;
     private bool isLerping = false;
 
     void Start()
