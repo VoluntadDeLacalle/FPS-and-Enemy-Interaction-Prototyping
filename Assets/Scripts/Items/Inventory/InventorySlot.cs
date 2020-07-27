@@ -37,6 +37,14 @@ public class InventorySlot : MonoBehaviour
         if (item != null)
         {
             item.Use();
+            if (item != null && item.numberAvalible > 1)
+            {
+                countText.text = item.numberAvalible.ToString();
+            }
+            else
+            {
+                count.SetActive(false);
+            }
         }
     }
 }
