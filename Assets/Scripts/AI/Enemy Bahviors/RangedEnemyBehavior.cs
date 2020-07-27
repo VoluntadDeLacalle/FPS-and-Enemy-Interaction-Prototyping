@@ -6,26 +6,30 @@ using DG.Tweening;
 
 public class RangedEnemyBehavior : Enemy
 {
-    private NavMeshAgent nav;
-    private NavMeshObstacle navObj;
+    private EnemyMovement3D agentMovement3D;
     private EnemyStateMachine stateMachine;
     private EnemyRaycastShoot raycastShoot;
 
-    public float attackDistance = 2f;
     public float rotationSpeed = 2f;
 
-    public float upwardYAltitude = 6f;
-    public float flyingUpSpeed = 2f;
+    [Header("Enemy Ranges")]
+    public float innerAttackRadius = 2f;
+    public float outerAttackRadius = 2f;
+
+    [Header("Altitude Range - Yellow Gizmo Line")]
+    public float minAltitude = 6f;
+    public float maxAltitude = 2f;
 
     private bool startMoving = false;
     private bool isAttacking = false;
 
     private Vector3 currentPlayerDestination = Vector3.zero;
+    private float currentAltitude = 0;
+    private float firstChaseEnter = 0f;
 
     void Awake()
     {
-        navObj = GetComponent<NavMeshObstacle>();
-        nav = GetComponent<NavMeshAgent>();
+        agentMovement3D = GetComponent<EnemyMovement3D>();
         stateMachine = GetComponent<EnemyStateMachine>();
         raycastShoot = GetComponent<EnemyRaycastShoot>();
     }
@@ -33,16 +37,21 @@ public class RangedEnemyBehavior : Enemy
     void Start()
     {
         currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
-        nav.SetDestination(currentPlayerDestination);
     }
 
     void OnDrawGizmosSelected()
     {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(currentPlayerDestination, innerAttackRadius);
+
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(gameObject.transform.position, attackDistance);
+        Gizmos.DrawWireSphere(currentPlayerDestination, outerAttackRadius);
+
+        Vector3 minAltitudeposition = new Vector3(transform.position.x, minAltitude, transform.position.z);
+        Vector3 maxAltitudeposition = new Vector3(transform.position.x, maxAltitude, transform.position.z);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.up * upwardYAltitude);
+        Gizmos.DrawLine(minAltitudeposition, maxAltitudeposition);
     }
 
     void Update()
@@ -51,15 +60,33 @@ public class RangedEnemyBehavior : Enemy
         PlayerCheck();
     }
 
+    Vector3 FindTargetPoint(float innerRadius, float outerRadius, float angle)
+    {
+        float ratio = innerRadius / outerRadius;
+        float radius = Mathf.Sqrt(Random.Range(ratio * ratio, 1f)) * outerRadius;
+
+        var dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+
+        return currentPlayerDestination + dir * radius;
+    }
+
+    void SetTargetPlayer()
+    {
+        currentAltitude = Random.Range(minAltitude, maxAltitude);
+        float targetAngle = Vector3.Angle(transform.position, currentPlayerDestination) + 90;
+
+        Vector3 target = FindTargetPoint(innerAttackRadius, outerAttackRadius, Random.Range(0, 2 * Mathf.PI));
+        target.y = currentAltitude;
+
+        agentMovement3D.SetDestination(target);
+    }
+
     bool PlayerCheck()
     {
-        if (Vector3.Distance(GameManager.instance.player.gameObject.transform.position, currentPlayerDestination) > (attackDistance / 2))
+        if (Vector3.Distance(GameManager.instance.player.gameObject.transform.position, currentPlayerDestination) > ((outerAttackRadius) / 2))
         {
             currentPlayerDestination = GameManager.instance.player.gameObject.transform.position;
-            if (nav.enabled)
-            {
-                nav.SetDestination(currentPlayerDestination);
-            }
+            SetTargetPlayer();
 
             return true;
         }
@@ -69,13 +96,16 @@ public class RangedEnemyBehavior : Enemy
 
     void LookAtPlayer()
     {
-        Vector3 playerLookDirection = currentPlayerDestination - transform.position;
-        //playerLookDirection.y = 0;
+        Vector3 playerLookDirection = GameManager.instance.player.transform.position - transform.position;
 
-        //transform.rotation = Quaternion.LookRotation(playerLookDirection);
-
-        ///Differnt look style
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerLookDirection), rotationSpeed * Time.deltaTime);
+        if (!agentMovement3D.isMoving)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerLookDirection), rotationSpeed * Time.deltaTime);
+        }
+        else
+        {
+            transform.rotation = Quaternion.LookRotation(playerLookDirection);
+        }
     }
 
     public override void Attacking()
@@ -84,30 +114,41 @@ public class RangedEnemyBehavior : Enemy
 
         if (PlayerCheck())
         {
-            navObj.enabled = false;
             startMoving = true;
             
             stateMachine.switchState(EnemyStateMachine.StateType.Chase);
         }
     }
 
+    public override void ChaseEnter()
+    {
+        if (firstChaseEnter != 0f)
+        {
+            SetTargetPlayer();
+        }
+        else
+        {
+            firstChaseEnter = 1f;
+        }
+    }
+
     public override void Chasing()
     {
-        if (startMoving && !navObj.enabled)
+        if (!agentMovement3D.isMoving)
         {
-            nav.enabled = true;
-            nav.SetDestination(currentPlayerDestination);
+            SetTargetPlayer();
+        }
 
+        if (startMoving)
+        { 
             startMoving = false;
             isAttacking = false;
         }
 
-        if (Vector3.Distance(transform.position, currentPlayerDestination) < attackDistance && !isAttacking)
+        if ((Vector3.Distance(transform.position, currentPlayerDestination) < innerAttackRadius + (Mathf.Abs(outerAttackRadius - innerAttackRadius) / 2)
+             || Vector3.Distance(transform.position, agentMovement3D.endOfPath) < .5f) && !isAttacking)
         {
-            nav.enabled = false;
-            navObj.enabled = true;
-
-            transform.DOMove(transform.position + Vector3.up * upwardYAltitude, flyingUpSpeed);
+            agentMovement3D.Stop();
 
             isAttacking = true;
             stateMachine.switchState(EnemyStateMachine.StateType.Attack);

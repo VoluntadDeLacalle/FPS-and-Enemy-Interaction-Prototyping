@@ -63,6 +63,7 @@ public class EnemyRaycastShoot : MonoBehaviour
                 if (hitInfo.transform.gameObject == target.transform.gameObject)
                 {
                     shotsLanded++;
+                    Debug.Log(hitInfo.transform.gameObject.name + " hit!");
 
                     if (shotsLanded % shotsToGetAccurate == 0 && canGetAccurate)
                     {
@@ -74,7 +75,7 @@ public class EnemyRaycastShoot : MonoBehaviour
                 }
             }
 
-            Debug.Log("Fire!");
+            //Debug.Log("Fire!");
             fireRate = maxFireRate;
         }
     }
