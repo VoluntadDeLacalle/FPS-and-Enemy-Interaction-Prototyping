@@ -762,9 +762,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navGridAgent: {fileID: 1243094925}
   speed: 15
+  lookPathDirection: 0
   pathSegments: 1
   endOfPath: {x: 0, y: 0, z: 0}
-  lookPathDirection: 0
   isMoving: 0
 --- !u!1 &1295255355
 GameObject:

@@ -27,6 +27,8 @@ public class RangedEnemyBehavior : Enemy
     private float currentAltitude = 0;
     private float firstChaseEnter = 0f;
 
+    List<Vector3> directionCheckList = new List<Vector3>();
+
     void Awake()
     {
         agentMovement3D = GetComponent<EnemyMovement3D>();
@@ -52,6 +54,12 @@ public class RangedEnemyBehavior : Enemy
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(minAltitudeposition, maxAltitudeposition);
+
+        Gizmos.color = Color.cyan;
+        foreach(Vector3 vec in directionCheckList)
+        {
+            Gizmos.DrawLine(currentPlayerDestination + vec, currentPlayerDestination + vec + Vector3.up * 3);
+        }
     }
 
     void Update()
@@ -60,25 +68,74 @@ public class RangedEnemyBehavior : Enemy
         PlayerCheck();
     }
 
-    Vector3 FindTargetPoint(float innerRadius, float outerRadius, float angle)
+    bool FindTargetPoint(float innerRadius, float outerRadius, float angle, float currentAltitude, out Vector3 agentDestination)
     {
+        agentDestination = Vector3.zero;
         float ratio = innerRadius / outerRadius;
         float radius = Mathf.Sqrt(Random.Range(ratio * ratio, 1f)) * outerRadius;
 
         var dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+        Vector3 targetPoint = currentPlayerDestination + dir * radius;
+        targetPoint.y = currentAltitude;
 
-        return currentPlayerDestination + dir * radius;
+        Vector3 playerPosition = GameManager.instance.player.transform.position;
+        if (Physics.Raycast(playerPosition, (targetPoint - playerPosition).normalized, radius))
+        {
+            List<Vector3> differentDirs = new List<Vector3>();
+            
+            Vector3 originalDir = dir;
+            for (int i = 0; i < 7; i++)
+            {
+                originalDir = Quaternion.AngleAxis(-45, Vector3.up) * originalDir;
+                differentDirs.Add(originalDir);
+            }
+
+            directionCheckList = differentDirs;
+
+            for (int i = 0; i < differentDirs.Count; i++)
+            {
+                int rand = Random.Range(0, differentDirs.Count);
+                Vector3 currentDir = differentDirs[rand];
+
+                Vector3 currentTargetPoint = currentPlayerDestination + currentDir * radius;
+                currentTargetPoint.y = currentAltitude;
+                if (Physics.Raycast(playerPosition, (currentTargetPoint - playerPosition).normalized, radius))
+                {
+                    differentDirs.Remove(currentDir);
+                    continue;
+                }
+                else
+                {
+                    //Debug.Log("Found it!");
+
+                    agentDestination = currentTargetPoint;
+                    return true;
+                }
+            }
+        }
+        else
+        {
+
+            agentDestination = targetPoint;
+            return true;
+        }
+
+        return false;
     }
 
     void SetTargetPlayer()
     {
         currentAltitude = Random.Range(minAltitude, maxAltitude);
-        float targetAngle = Vector3.Angle(transform.position, currentPlayerDestination) + 90;
-
-        Vector3 target = FindTargetPoint(innerAttackRadius, outerAttackRadius, Random.Range(0, 2 * Mathf.PI));
-        target.y = currentAltitude;
-
-        agentMovement3D.SetDestination(target);
+        Vector3 target;
+        if(FindTargetPoint(innerAttackRadius, outerAttackRadius, Random.Range(0, 2 * Mathf.PI), currentAltitude,out target))
+        {
+            agentMovement3D.SetDestination(target);
+        }
+        else
+        {
+            Debug.Log("Idle.");
+            stateMachine.switchState(EnemyStateMachine.StateType.Idle);
+        }
     }
 
     bool PlayerCheck()
@@ -146,7 +203,7 @@ public class RangedEnemyBehavior : Enemy
         }
 
         if ((Vector3.Distance(transform.position, currentPlayerDestination) < innerAttackRadius + (Mathf.Abs(outerAttackRadius - innerAttackRadius) / 2)
-             || Vector3.Distance(transform.position, agentMovement3D.endOfPath) < .5f) && !isAttacking)
+             || (Vector3.Distance(transform.position, agentMovement3D.endOfPath) < .5f && agentMovement3D.isMoving)) && !isAttacking)
         {
             agentMovement3D.Stop();
 

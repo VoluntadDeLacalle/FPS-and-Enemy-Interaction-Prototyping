@@ -21,6 +21,25 @@ namespace NavExtension {
 
             return path;
         }
+
+        //Possibly to fix 3D getting stuck on edge.
+        public static NavUnit[] GetCurrentNavUnits(this NavGrid navGrid)
+        {
+            NavUnit[] navGridUnits = new NavUnit[navGrid.navGridSizeX * navGrid.navGridSizeY * navGrid.navGridSizeZ];
+            int l = 0;
+            for (int j = 0; j < navGrid.navGridSizeY; j++)
+            {
+                for (int k = 0; k < navGrid.navGridSizeZ; k++)
+                {
+                    for (int i = 0; i < navGrid.navGridSizeX; i++)
+                    {
+                        navGridUnits[l] = new NavUnit(i, j, k, navGrid);
+                        l++;
+                    }
+                }
+            }
+            return navGridUnits;
+        }
     }
 }
 

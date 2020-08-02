@@ -69,22 +69,35 @@ public class EnemyMovement3D : MonoBehaviour
     public void SetDestination(Vector3 target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
-        endOfPath = pathToTarget[pathToTarget.Count - 1];
-        currentGizmoPath = new List<Vector3>(pathToTarget);
+        if (pathToTarget.Count != 0)
+        {
+            endOfPath = pathToTarget[pathToTarget.Count - 1];
+            currentGizmoPath = new List<Vector3>(pathToTarget);
 
-        count = 1;
-        StartLerping();
+            count = 1;
+            StartLerping();
+        }
+        else
+        {
+            Debug.Log("No path to target.");
+        }
     }
 
     public void SetDestination(Transform target)
     {
         pathToTarget = navGridAgent.FindPathToTarget(target);
-        endOfPath = pathToTarget[pathToTarget.Count - 1];
+        if (pathToTarget.Count != 0)
+        {
+            endOfPath = pathToTarget[pathToTarget.Count - 1];
+            currentGizmoPath = new List<Vector3>(pathToTarget);
 
-        currentGizmoPath = new List<Vector3>(pathToTarget);
-
-        count = 1;
-        StartLerping();
+            count = 1;
+            StartLerping();
+        }
+        else
+        {
+            Debug.Log("No path to target.");
+        }
     }
 
     public void Stop()
@@ -111,7 +124,7 @@ public class EnemyMovement3D : MonoBehaviour
 
     void Update()
     {
-        if (isLerping && lookPathDirection)
+        if (isLerping && lookPathDirection && pathToTarget.Count != 0)
         {
             LookAtPath();
         }
@@ -119,7 +132,7 @@ public class EnemyMovement3D : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isLerping)
+        if (isLerping && pathToTarget.Count != 0)
         {
             float timeSinceStarted = Time.time - timeStartedLerping;
             float percentageComplete = timeSinceStarted / timeTakenDuringLerp;
