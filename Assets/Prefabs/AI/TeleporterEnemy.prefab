@@ -228,7 +228,8 @@ MonoBehaviour:
   teleportTimer: 8
   teleportAwayRadius: 20
   teleportAwayCushionRadius: 6
-  teleportBehindAngle: 260
+  onlyTeleportBehind: 0
+  teleportBehindAngle: 90
   attackDistance: 2
   attackTimer: 2
 --- !u!114 &5958182756590889413

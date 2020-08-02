@@ -13,7 +13,7 @@ public class TeleporterEnemyBehavior : Enemy
     public float teleportAwayRadius = 0f;
     public float teleportAwayCushionRadius = 0f;
 
-    //public bool onlyTeleportBehind = false;
+    public bool onlyTeleportBehind = false;
     [Range(0, 360)] public float teleportBehindAngle = 45f;
 
     public float attackDistance = 2f;
@@ -21,6 +21,7 @@ public class TeleporterEnemyBehavior : Enemy
     private float maxAttackTimer = 0f;
 
     private Vector3 currentPlayerDestination = Vector3.zero;
+    private Transform player = null;
 
     void Awake()
     {
@@ -31,6 +32,11 @@ public class TeleporterEnemyBehavior : Enemy
 
         maxTeleportTimer = teleportTimer;
         maxAttackTimer = attackTimer;
+    }
+
+    void Start()
+    {
+        player = GameManager.instance.player.transform;
     }
 
     void OnDrawGizmosSelected()
@@ -44,12 +50,15 @@ public class TeleporterEnemyBehavior : Enemy
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackDistance);
 
-        Gizmos.color = Color.green;
-        Vector3 teleportBehindAngleA = DirFromAngle(-teleportBehindAngle / 2, false);
-        Vector3 teleportBehindAngleB = DirFromAngle(teleportBehindAngle / 2, false);
+        if (player != null)
+        {
+            Gizmos.color = Color.green;
+            Vector3 teleportBehindAngleA = Quaternion.AngleAxis(-teleportBehindAngle / 2, Vector3.up) * -player.forward;
+            Vector3 teleportBehindAngleB = Quaternion.AngleAxis(teleportBehindAngle / 2, Vector3.up) * -player.forward;
 
-        //Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination + teleportBehindAngleA * teleportAwayCushionRadius);
-        //Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination + teleportBehindAngleB * teleportAwayCushionRadius);
+            Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination + teleportBehindAngleA * teleportAwayCushionRadius);
+            Gizmos.DrawLine(currentPlayerDestination, currentPlayerDestination + teleportBehindAngleB * teleportAwayCushionRadius);
+        }
     }
 
     void Update()
@@ -108,6 +117,16 @@ public class TeleporterEnemyBehavior : Enemy
         return currentPlayerDestination + dir * radius;
     }
 
+    Vector3 FindTeleportPointBehind(float innerRadius, float outerRadius, float angle)
+    {
+        float ratio = innerRadius / outerRadius;
+        float radius = Mathf.Sqrt(Random.Range(ratio * ratio, 1f)) * outerRadius;
+        int sign = Random.Range(0, 2) * 2 - 1;
+        Vector3 dir = Quaternion.AngleAxis(sign * angle, Vector3.up) * -player.forward;
+
+        return currentPlayerDestination + dir * radius;
+    }
+
     Vector3 TeleportAway()
     {
         Vector3 newDestination = FindTeleportPoint(teleportAwayCushionRadius + attackDistance, teleportAwayRadius, Random.Range(0, 2f * Mathf.PI));
@@ -134,14 +153,14 @@ public class TeleporterEnemyBehavior : Enemy
 
     Vector3 TeleportToPlayer()
     {
-        //if (onlyTeleportBehind)
-        //{
-            //return FindTeleportPoint(attackDistance, attackDistance, Random.Range(-teleportBehindAngle * Mathf.Deg2Rad, teleportBehindAngle * Mathf.Deg2Rad));
-        //}
-       // else
-        //{
+        if (onlyTeleportBehind)
+        {
+            return FindTeleportPointBehind(attackDistance, attackDistance, Random.Range(0, teleportBehindAngle / 2));
+        }
+        else
+        {
             return FindTeleportPoint(attackDistance, attackDistance, Random.Range(0, 2f * Mathf.PI));
-        //}
+        }
     }
 
     public override void AttackEnter()
