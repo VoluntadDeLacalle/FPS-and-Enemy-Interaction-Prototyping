@@ -8,6 +8,8 @@ TagManager:
   - Arrow
   - Gremlin
   - Torch Light
+  - Bullet
+  - Sword
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Ground
   - 
   - 
   - 
