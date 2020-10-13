@@ -28,7 +28,8 @@ public class Target : MonoBehaviour
             TakeDamage(FindObjectOfType<Gun>().damage);
         }
 
-        else if(other.tag == "Sword")
+        else if(other.tag == "Sword" && FindObjectOfType<Gun>().animator.GetCurrentAnimatorStateInfo(0).IsName("Sword Attack") || 
+            FindObjectOfType<Gun>().animator.GetAnimatorTransitionInfo(0).IsName("Sword Idle -> Sword Attack"))
         {
             Debug.Log("Triggered by Sword");
             TakeDamage(FindObjectOfType<Gun>().damage);
