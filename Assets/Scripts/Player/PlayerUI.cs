@@ -24,6 +24,8 @@ public class PlayerUI : MonoBehaviour
     public Text attackStateText;
     public Text sprintText;
 
+    public bool isAlive;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +34,7 @@ public class PlayerUI : MonoBehaviour
         setStatText(hydration, hydrationText, "Hydration: ");
         setStatText(sprint, sprintText, "Sprint: ");
         setattackState();
+        isAlive = true;
     }
 
     // Update is called once per frame
@@ -45,6 +48,11 @@ public class PlayerUI : MonoBehaviour
         setStatText(hydration, hydrationText, "Hydration: ");
         setStatText(sprint, sprintText, "Sprint: ");
         setattackState();
+
+        if(health <= 0)
+        {
+            isAlive = false;
+        }
     }
 
 
