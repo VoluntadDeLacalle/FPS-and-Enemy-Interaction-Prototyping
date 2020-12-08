@@ -807,6 +807,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: First Person Controller
       objectReference: {fileID: 0}
+    - target: {fileID: 6376069831430715559, guid: 59c7e5d9221604f4db0d6a32cf5cdc70,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6376069831430715559, guid: 59c7e5d9221604f4db0d6a32cf5cdc70,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 6462537595186145358, guid: 59c7e5d9221604f4db0d6a32cf5cdc70,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6530802886777372552, guid: 59c7e5d9221604f4db0d6a32cf5cdc70,
         type: 3}
       propertyPath: m_TagString
