@@ -27,13 +27,12 @@ public class Gun : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            if(isRaycast)
+            if (isRaycast)
                 Shoot();
-            
+
             if (!isRaycast)
             {
                 animator.SetBool("isAttacking", true);
-                swordCollider.enabled = true;
                 FindObjectOfType<PlayerUI>().hunger -= attackStatDegredation;
                 FindObjectOfType<PlayerUI>().hydration -= attackStatDegredation;
             }
@@ -42,7 +41,6 @@ public class Gun : MonoBehaviour
         else if (Input.GetKeyUp(KeyCode.Mouse0))
         {
             animator.SetBool("isAttacking", false);
-            swordCollider.enabled = false;
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse1))
@@ -89,15 +87,5 @@ public class Gun : MonoBehaviour
         GameObject cloneBullet = Instantiate(bullet, barrel.transform.position, barrel.transform.rotation) as GameObject;
         cloneBullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed);
         Destroy(cloneBullet, 5f);
-    }
-
-    private void OnAnimatorMove()
-    {
-        stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        if (stateInfo.IsTag("Attack"))
-        {
-
-            animator.ApplyBuiltinRootMotion();
-        }
     }
 }

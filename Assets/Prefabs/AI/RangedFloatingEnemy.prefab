@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f82d4b6d087a93c44a71d9f35203a2b1, type: 2}
+  - {fileID: 2100000, guid: 1b56c838336188241abe1b5d5096dff4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -112,9 +112,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f23b8394e5e8bb4fb9a5edcc0e79415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationSpeed: 50
   innerAttackRadius: 5
   outerAttackRadius: 9
-  rotationSpeed: 50
   minAltitude: 5
   maxAltitude: 7
 --- !u!114 &2681705777051141962
@@ -175,9 +175,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navGridAgent: {fileID: 4746331814929103249}
   speed: 4
+  lookPathDirection: 1
   pathSegments: 1
   endOfPath: {x: 0, y: 0, z: 0}
-  lookPathDirection: 1
   isMoving: 0
 --- !u!1 &5888628240190710289
 GameObject:
