@@ -11,11 +11,18 @@ public class PlayerMovement : MonoBehaviour
     private bool isCrouching;
     
     Vector3 velocity;
-    public float gravity;
-    public float jumpHeight;
     
+    [HideInInspector]
+    public float gravity;
+    
+    public float jumpHeight;
+
+    [HideInInspector]
     public Transform groundCheck;
+    
     float groundDistance = 0.4f;
+    
+    [HideInInspector]
     public LayerMask groundMask;
     bool isGrounded;
 
@@ -34,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     
     public float crouchSpeed;
     public float crouchAmount;
+    public float crouchForwardAmount;
     public GameObject crouchCollider;
     public GameObject standingCollider;
     private Vector3 cameraOrigin;
@@ -43,6 +51,17 @@ public class PlayerMovement : MonoBehaviour
     private Camera normalCam;
 
     public float sprintStatDegredation;
+
+    [Range (0f,0.2f)]
+    public float movementBobIntensity;
+    [Range(0f, 0.2f)]
+    public float idleBobIntensity;
+    [Range(0f, 0.2f)]
+    public float crouchBobIntensity;
+    [Range(0f, 0.2f)]
+    public float sprintBobIntensity;
+    [Range(0f, 0.2f)]
+    public float jumpBobIntensity;
 
 
     // Start is called before the first frame update
@@ -151,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
         //Idle Head Bob
         if (x == 0 && z == 0)
         {
-            HeadBob(idleCounter, 0.035f, 0.035f);
+            HeadBob(idleCounter, idleBobIntensity, idleBobIntensity); //default = 0.035f
             idleCounter += Time.deltaTime;
 
             //Smoothen Head Bob
@@ -161,7 +180,7 @@ public class PlayerMovement : MonoBehaviour
         //Sprint Head Bob
         else if (isSprinting)
         {
-            HeadBob(movementCounter, 0.1f, 0.1f);
+            HeadBob(movementCounter, sprintBobIntensity, sprintBobIntensity); //default = 0.1f
             movementCounter += Time.deltaTime * 6f;
 
             //Smoothen Head Bob
@@ -170,7 +189,7 @@ public class PlayerMovement : MonoBehaviour
 
         else if (!isGrounded)
         {
-            HeadBob(idleCounter, 0.035f, 0.035f);
+            HeadBob(idleCounter, jumpBobIntensity, jumpBobIntensity); //default = 0.035f
             idleCounter += 0f;
 
             //Smoothen Head Bob
@@ -179,7 +198,7 @@ public class PlayerMovement : MonoBehaviour
 
         else if (isCrouching)
         {
-            HeadBob(movementCounter, 0.02f, 0.02f);
+            HeadBob(movementCounter, crouchBobIntensity, crouchBobIntensity); //default = 0.02f
             movementCounter += Time.deltaTime * 1.7f;
 
             //Smoothen Head Bob
@@ -189,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
         //Motion Head Bob
         else
         {
-            HeadBob(movementCounter, 0.05f, 0.05f);
+            HeadBob(movementCounter, movementBobIntensity, movementBobIntensity); //default = 0.05f
             movementCounter += Time.deltaTime * 3f;
 
             //Smoothen Head Bob
@@ -202,7 +221,7 @@ public class PlayerMovement : MonoBehaviour
         //Camera
         if (isCrouching)
         {
-            normalCam.transform.localPosition = Vector3.Lerp(normalCam.transform.localPosition, cameraOrigin + Vector3.down * crouchAmount, Time.deltaTime * 6f);
+            normalCam.transform.localPosition = Vector3.Lerp(normalCam.transform.localPosition, cameraOrigin + (Vector3.forward * crouchForwardAmount) + (Vector3.down * crouchAmount), Time.deltaTime * 6f);
         }
         else
         {

@@ -25,14 +25,14 @@ public class Target : MonoBehaviour
         if (other.tag == "Bullet")
         {
             Debug.Log("Triggered by Bullet");
-            TakeDamage(FindObjectOfType<Gun>().damage);
+            TakeDamage(FindObjectOfType<Gun>().projectileDamage);
         }
 
         else if(other.tag == "Sword" && FindObjectOfType<Gun>().animator.GetCurrentAnimatorStateInfo(0).IsName("Sword Attack") || 
             FindObjectOfType<Gun>().animator.GetAnimatorTransitionInfo(0).IsName("Sword Idle -> Sword Attack"))
         {
             Debug.Log("Triggered by Sword");
-            TakeDamage(FindObjectOfType<Gun>().damage);
+            TakeDamage(FindObjectOfType<Gun>().meleeDamage);
         }
     }
 

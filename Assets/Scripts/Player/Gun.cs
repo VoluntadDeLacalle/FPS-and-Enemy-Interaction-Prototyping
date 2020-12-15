@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class Gun : MonoBehaviour
 {
-    public float damage;
-    public float range;
+    public float projectileDamage;
+    public float raycastDamage;
+    public float meleeDamage;
+    public float raycastRange;
     public Camera fpsCam;
     public GameObject bullet;
     public GameObject barrel;
@@ -62,14 +64,15 @@ public class Gun : MonoBehaviour
     public void Shoot()
     {
         RaycastHit hit;
-        if(Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
+        if(Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, raycastRange))
         {
-            Debug.Log(hit.transform.name);
+            Debug.Log(hit.transform.name + " but took no damage");
             Target target = hit.transform.GetComponent<Target>();
             
             if(target != null)
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(raycastDamage);
+                Debug.Log(hit.transform.name + " took " + raycastDamage + " damage");
             }
 
             if(hit.rigidbody != null)
