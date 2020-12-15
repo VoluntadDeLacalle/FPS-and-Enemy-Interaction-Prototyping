@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Gavin Wrote This
+
 public class EnemyRaycastShoot : MonoBehaviour
 {
     public float fireRate = 0;
